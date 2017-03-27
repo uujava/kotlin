@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ public class ResolveSessionUtils {
 
     @NotNull
     public static Name safeNameForLazyResolve(@Nullable Name name) {
-        return SpecialNames.safeIdentifier(name);
+        return name != null ? name : SpecialNames.NO_NAME_PROVIDED;
     }
 
     @Nullable
