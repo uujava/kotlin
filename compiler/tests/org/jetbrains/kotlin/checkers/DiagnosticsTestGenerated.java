@@ -1048,6 +1048,12 @@ public class DiagnosticsTestGenerated extends AbstractDiagnosticsTest {
                 doTest(fileName);
             }
 
+            @TestMetadata("errorAnnotationArgumentsOfCtorParam.kt")
+            public void testErrorAnnotationArgumentsOfCtorParam() throws Exception {
+                String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/annotations/errorAnnotationArgumentsOfCtorParam.kt");
+                doTest(fileName);
+            }
+
             @TestMetadata("extensionFunctionType.kt")
             public void testExtensionFunctionType() throws Exception {
                 String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/diagnostics/tests/annotations/extensionFunctionType.kt");

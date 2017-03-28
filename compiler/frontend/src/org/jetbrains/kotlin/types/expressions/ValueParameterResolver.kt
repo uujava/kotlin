@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.jetbrains.kotlin.types.expressions
 import org.jetbrains.kotlin.descriptors.ValueParameterDescriptor
 import org.jetbrains.kotlin.diagnostics.Errors
 import org.jetbrains.kotlin.psi.KtParameter
+import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.DescriptorResolver
 import org.jetbrains.kotlin.resolve.DescriptorUtils
@@ -48,6 +49,12 @@ class ValueParameterResolver(
 
         for ((descriptor, parameter) in valueParameterDescriptors.zip(valueParameters)) {
             ForceResolveUtil.forceResolveAllContents(descriptor.annotations)
+
+            // Annotations on value parameter and constructor parameter could be splitted
+            trace[BindingContext.PRIMARY_CONSTRUCTOR_PARAMETER, parameter]?.let {
+                ForceResolveUtil.forceResolveAllContents(it.annotations)
+            }
+
             resolveDefaultValue(descriptor, parameter, contextForDefaultValue)
         }
     }

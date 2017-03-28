@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 JetBrains s.r.o.
+ * Copyright 2010-2017 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,15 +138,6 @@ abstract class AbstractDiagnosticsTest : BaseDiagnosticsTest() {
             assertFalse("No lazy log expected, but found: ${lazyLogFile.absolutePath}", lazyLogFile.exists())
         }
 
-        var exceptionFromDescriptorValidation: Throwable? = null
-        try {
-            val expectedFile = File(FileUtil.getNameWithoutExtension(testDataFile.absolutePath) + ".txt")
-            validateAndCompareDescriptorWithFile(expectedFile, files, modules)
-        }
-        catch (e: Throwable) {
-            exceptionFromDescriptorValidation = e
-        }
-
         // main checks
         var ok = true
 
@@ -181,6 +172,15 @@ abstract class AbstractDiagnosticsTest : BaseDiagnosticsTest() {
         KotlinTestUtils.assertEqualsToFile(testDataFile, actualText.toString())
 
         assertTrue("Diagnostics mismatch. See the output above", ok)
+
+        var exceptionFromDescriptorValidation: Throwable? = null
+        try {
+            val expectedFile = File(FileUtil.getNameWithoutExtension(testDataFile.absolutePath) + ".txt")
+            validateAndCompareDescriptorWithFile(expectedFile, files, modules)
+        }
+        catch (e: Throwable) {
+            exceptionFromDescriptorValidation = e
+        }
 
         // now we throw a previously found error, if any
         exceptionFromDescriptorValidation?.let { throw it }
