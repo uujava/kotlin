@@ -1063,7 +1063,7 @@ public class ImplementationBodyCodegen extends ClassBodyCodegen {
         }
     }
 
-    private void generateInitializers(@NotNull final ExpressionCodegen codegen) {
+    public void generateInitializers(@NotNull final ExpressionCodegen codegen) {
         generateInitializers(new Function0<ExpressionCodegen>() {
             @Override
             public ExpressionCodegen invoke() {
