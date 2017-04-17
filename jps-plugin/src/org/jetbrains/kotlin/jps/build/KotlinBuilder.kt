@@ -753,6 +753,10 @@ class KotlinBuilder : ModuleLevelBuilder(BuilderCategory.SOURCE_PROCESSOR) {
                         location?.column?.toLong() ?: -1
                 ))
             }
+            else {
+                val path = if (location != null) "${location.path}:${location.line}:${location.column}: " else ""
+                KotlinBuilder.LOG.debug(path + message)
+            }
         }
 
         override fun clear() {
