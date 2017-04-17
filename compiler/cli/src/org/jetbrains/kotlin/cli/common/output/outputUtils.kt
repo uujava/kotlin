@@ -38,7 +38,8 @@ fun OutputFileCollection.writeAllTo(outputDir: File) {
 }
 
 fun OutputFileCollection.writeAll(outputDir: File, messageCollector: MessageCollector, reportOutputFiles: Boolean) {
-    writeAll(outputDir, if (!reportOutputFiles) null else fun(_: OutputFile, sources: List<File>, output: File) {
+    if (!reportOutputFiles) writeAllTo(outputDir)
+    else writeAll(outputDir) { _, sources, output ->
         messageCollector.report(CompilerMessageSeverity.OUTPUT, OutputMessageUtil.formatOutputMessage(sources, output))
-    })
+    }
 }
