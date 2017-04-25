@@ -121,7 +121,7 @@ object NashornJsTestChecker {
                 BasicBoxTest.DIST_DIR_JS_PATH + "kotlin-test.js"
         ).forEach(engine::loadFile)
 
-        engine.eval("this['kotlin-test'].kotlin.test._asserter = new this['kotlin-test'].kotlin.test.DefaultAsserter()")
+        engine.eval("this['kotlin-test'].kotlin.test.overrideAsserter_wbnzx$(new this['kotlin-test'].kotlin.test.DefaultAsserter());")
 
         return engine
     }
