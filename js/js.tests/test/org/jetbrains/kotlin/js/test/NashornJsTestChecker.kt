@@ -31,6 +31,8 @@ private fun ScriptEngine.loadFile(path: String) {
     eval("load('$path');")
 }
 
+private fun ScriptObjectMirror.toMapWithAllMembers(): Map<String, Any?> = getOwnKeys(true).associate { it to this[it] }
+
 object NashornJsTestChecker {
     private val SETUP_KOTLIN_OUTPUT = "kotlin.kotlin.io.output = new kotlin.kotlin.io.BufferedOutput();"
     private val GET_KOTLIN_OUTPUT = "kotlin.kotlin.io.output.buffer;"
@@ -92,7 +94,7 @@ object NashornJsTestChecker {
             f: ScriptEngine.() -> Any?
     ): Any? {
         val globalObject = engine.eval("this") as ScriptObjectMirror
-        val before = globalObject.entries.toSet()
+        val before = globalObject.toMapWithAllMembers()
 
         engine.eval(SETUP_KOTLIN_OUTPUT)
 
@@ -101,9 +103,11 @@ object NashornJsTestChecker {
             return engine.f()
         }
         finally {
-            val diff = globalObject.entries - before
+            val after = globalObject.toMapWithAllMembers()
+            val diff = after.entries - before.entries
+
             diff.forEach {
-                globalObject.put(it.key, ScriptRuntime.UNDEFINED)
+                globalObject.put(it.key, before[it.key] ?: ScriptRuntime.UNDEFINED)
             }
         }
     }
