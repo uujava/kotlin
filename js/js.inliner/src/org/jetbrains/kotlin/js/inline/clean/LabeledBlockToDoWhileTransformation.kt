@@ -18,19 +18,18 @@ package org.jetbrains.kotlin.js.inline.clean
 
 import org.jetbrains.kotlin.js.backend.ast.*
 
-class LabeledBlockToDoWhileTransformation(private val root: JsNode) {
-    private var hasChanges = false
-
-    fun apply(): Boolean {
-        perform()
-        return hasChanges
+object LabeledBlockToDoWhileTransformation {
+    fun apply(fragments: List<JsProgramFragment>) {
+        for (fragment in fragments) {
+            process(fragment.declarationBlock)
+            process(fragment.initializerBlock)
+        }
     }
 
-    private fun perform() {
+    private fun process(root: JsNode) {
         object : JsVisitorWithContextImpl() {
             override fun endVisit(x: JsLabel, ctx: JsContext<JsNode>) {
                 if (x.statement is JsBlock) {
-                    hasChanges = true
                     x.statement = JsDoWhile(JsLiteral.FALSE, x.statement)
                 }
 

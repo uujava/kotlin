@@ -125,6 +125,8 @@ public final class K2JSTranslator {
 
         JsInliner.process(config, analysisResult.getBindingTrace(), translationResult.getInnerModuleName(), allFragments, newFragments);
 
+        LabeledBlockToDoWhileTransformation.INSTANCE.apply(newFragments);
+
         CoroutineTransformer coroutineTransformer = new CoroutineTransformer(translationResult.getProgram());
         for (JsProgramFragment fragment : newFragments) {
             coroutineTransformer.accept(fragment.getDeclarationBlock());
@@ -175,8 +177,6 @@ public final class K2JSTranslator {
         for (JsImportedModule module : translationResult.getImportedModuleList()) {
             importedModules.add(module.getExternalName());
         }
-
-        new LabeledBlockToDoWhileTransformation(program).apply();
 
         return new TranslationResult.Success(config, files, translationResult.getProgram(), diagnostics, importedModules,
                                              moduleDescriptor, bindingTrace.getBindingContext(), metadataHeader, fileMap);
