@@ -20,6 +20,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.psi.impl.light.LightElement
 import org.jetbrains.kotlin.asJava.LightClassGenerationSupport
+import org.jetbrains.kotlin.asJava.classes.KtLightClassForSourceDeclaration
 import org.jetbrains.kotlin.asJava.classes.lazyPub
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
@@ -69,6 +70,13 @@ class KtLightSimpleModifierList(
 private fun computeAnnotations(lightModifierList: KtLightModifierList<*>): List<PsiAnnotation> {
     val annotationsForEntries = lightAnnotationsForEntries(lightModifierList)
     val modifierListOwner = lightModifierList.parent
+    if (modifierListOwner is KtLightClassForSourceDeclaration && modifierListOwner.isAnnotationType) {
+        val sourceAnnotationNames = annotationsForEntries.mapTo(mutableSetOf()) { it.qualifiedName }
+        val specialAnnotationsOnAnnotationClass = modifierListOwner.clsDelegate.modifierList?.annotations.orEmpty().filter {
+            it.qualifiedName !in sourceAnnotationNames
+        }.map { KtLightNonSourceAnnotation(lightModifierList, it) }
+        return annotationsForEntries + specialAnnotationsOnAnnotationClass
+    }
     if ((modifierListOwner is KtLightMember<*> && modifierListOwner !is KtLightFieldImpl.KtLightEnumConstant)
         || modifierListOwner is KtLightParameter) {
         return annotationsForEntries +
@@ -85,7 +93,6 @@ private fun lightAnnotationsForEntries(lightModifierList: KtLightModifierList<*>
     if (annotatedKtDeclaration == null || !annotatedKtDeclaration.isValid || !hasAnnotationsInSource(annotatedKtDeclaration)) {
         return emptyList()
     }
-
 
     return getAnnotationDescriptors(annotatedKtDeclaration, lightModifierListOwner)
             .map { descriptor ->
@@ -131,7 +138,7 @@ private fun hasAnnotationsInSource(declaration: KtDeclaration): Boolean {
 }
 
 private fun AnnotationWithTarget.matches(annotated: KtLightElement<*, *>): Boolean {
-    if (annotated !is KtLightField) return true
+    if (annotated !is KtLightFieldImpl.KtLightFieldForDeclaration) return true
 
     if (target == AnnotationUseSiteTarget.FIELD) return true
 

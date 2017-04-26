@@ -191,6 +191,17 @@ abstract class KtLightAbstractAnnotation(parent: PsiElement,
     override fun getParameterList() = clsDelegate.parameterList
 }
 
+class KtLightNonSourceAnnotation(
+        parent: PsiElement, clsDelegate: PsiAnnotation
+): KtLightAbstractAnnotation(parent, { clsDelegate }) {
+    override val kotlinOrigin: KtAnnotationEntry? get() = null
+    override fun getQualifiedName() = clsDelegate.qualifiedName
+    override fun <T : PsiAnnotationMemberValue?> setDeclaredAttributeValue(attributeName: String?, value: T?)
+            = clsDelegate.setDeclaredAttributeValue(attributeName, value)
+    override fun findAttributeValue(attributeName: String?) = clsDelegate.findAttributeValue(attributeName)
+    override fun findDeclaredAttributeValue(attributeName: String?) = clsDelegate.findDeclaredAttributeValue(attributeName)
+}
+
 class KtLightNonExistentAnnotation(parent: KtLightElement<*, *>) : KtLightElementBase(parent), PsiAnnotation {
     override val kotlinOrigin get() = null
     override fun toString() = this.javaClass.name
