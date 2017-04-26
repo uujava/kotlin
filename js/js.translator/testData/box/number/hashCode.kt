@@ -1,3 +1,5 @@
+// MINIFICATION_THRESHOLD: 477
+
 fun box(): String {
 
 
