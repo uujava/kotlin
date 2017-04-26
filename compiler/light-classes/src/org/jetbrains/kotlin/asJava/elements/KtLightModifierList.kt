@@ -86,13 +86,22 @@ private fun lightAnnotationsForEntries(lightModifierList: KtLightModifierList<*>
         return emptyList()
     }
 
-    return getAnnotationDescriptors(annotatedKtDeclaration, lightModifierListOwner).map { descriptor ->
-        val annotationFqName = descriptor.type.constructor.declarationDescriptor?.fqNameUnsafe?.asString() ?: return emptyList()
-        val entry = descriptor.source.getPsi() as? KtAnnotationEntry ?: return emptyList()
-        KtLightAnnotationForSourceEntry(annotationFqName, entry, lightModifierList) {
-            lightModifierList.clsDelegate.findAnnotation(annotationFqName) ?: KtLightNonExistentAnnotation(lightModifierList)
-        }
-    }
+
+    return getAnnotationDescriptors(annotatedKtDeclaration, lightModifierListOwner)
+            .map { descriptor ->
+                Pair(descriptor.type.constructor.declarationDescriptor?.fqNameUnsafe?.asString(), descriptor.source.getPsi() as? KtAnnotationEntry)
+            }
+            .filter { (fqName, entry) -> fqName != null && entry != null }
+            .groupBy(Pair<String?, KtAnnotationEntry?>::first, Pair<String?, KtAnnotationEntry?>::second)
+            .flatMap {
+                (fqName, entries) ->
+                entries.mapIndexed { index, entry ->
+                    KtLightAnnotationForSourceEntry(fqName!!, entry!!, lightModifierList) {
+                        lightModifierList.clsDelegate.annotations.filter { it.qualifiedName == fqName }.getOrNull(index)
+                        ?: KtLightNonExistentAnnotation(lightModifierList)
+                    }
+                }
+            }
 }
 private fun getAnnotationDescriptors(declaration: KtDeclaration?, annotatedLightElement: KtLightElement<*, *>): List<AnnotationDescriptor> {
     val descriptor = declaration?.let { LightClassGenerationSupport.getInstance(it.project).resolveToDescriptor(it) }

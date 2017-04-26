@@ -21,7 +21,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Comparing
 import com.intellij.psi.*
 import com.intellij.psi.impl.light.LightEmptyImplementsList
-import com.intellij.psi.impl.light.LightModifierList
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.CachedValue
 import com.intellij.psi.util.CachedValueProvider
@@ -32,9 +31,9 @@ import org.jetbrains.annotations.NonNls
 import org.jetbrains.kotlin.asJava.builder.LightClassDataHolder
 import org.jetbrains.kotlin.asJava.builder.LightClassDataProviderForFileFacade
 import org.jetbrains.kotlin.asJava.elements.FakeFileForLightClass
+import org.jetbrains.kotlin.asJava.elements.KtLightSimpleModifierList
 import org.jetbrains.kotlin.fileClasses.JvmFileClassUtil
 import org.jetbrains.kotlin.fileClasses.javaFileFacadeFqName
-import org.jetbrains.kotlin.idea.KotlinLanguage
 import org.jetbrains.kotlin.load.java.structure.LightClassOriginKind
 import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
 import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils.fileHasTopLevelCallables
@@ -90,7 +89,7 @@ class KtLightClassForFacade private constructor(
             facadeClassFqName.parent()
 
     private val modifierList: PsiModifierList =
-            LightModifierList(manager, KotlinLanguage.INSTANCE, PsiModifier.PUBLIC, PsiModifier.FINAL)
+            KtLightSimpleModifierList(this, setOf(PsiModifier.PUBLIC, PsiModifier.FINAL))
 
     private val implementsList: LightEmptyImplementsList =
             LightEmptyImplementsList(manager)

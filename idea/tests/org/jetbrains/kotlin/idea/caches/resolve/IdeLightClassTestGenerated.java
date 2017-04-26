@@ -164,6 +164,12 @@ public class IdeLightClassTestGenerated extends AbstractIdeLightClassTest {
             doTest(fileName);
         }
 
+        @TestMetadata("RepetableAnnotations.kt")
+        public void testRepetableAnnotations() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/asJava/lightClasses/compilationErrors/RepetableAnnotations.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("SameName.kt")
         public void testSameName() throws Exception {
             String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/asJava/lightClasses/compilationErrors/SameName.kt");

@@ -23,10 +23,13 @@ import com.intellij.psi.*
 import com.intellij.psi.impl.java.stubs.PsiJavaFileStub
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
+import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
 import org.jetbrains.kotlin.asJava.LightClassTestCommon
 import org.jetbrains.kotlin.asJava.builder.LightClassConstructionContext
 import org.jetbrains.kotlin.asJava.builder.StubComputationTracker
 import org.jetbrains.kotlin.asJava.classes.KtLightClass
+import org.jetbrains.kotlin.asJava.classes.KtLightClassForFacade
 import org.jetbrains.kotlin.asJava.classes.KtLightClassForSourceDeclaration
 import org.jetbrains.kotlin.asJava.elements.*
 import org.jetbrains.kotlin.idea.KotlinDaemonAnalyzerTestCase
@@ -41,10 +44,12 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.test.KotlinTestUtils
 import org.jetbrains.kotlin.test.MockLibraryUtil
 import org.jetbrains.kotlin.utils.keysToMap
+import org.jetbrains.plugins.groovy.lang.psi.impl.stringValue
 import org.junit.Assert
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 abstract class AbstractIdeLightClassTest : KotlinLightCodeInsightFixtureTestCase() {
     fun doTest(testDataPath: String) {
@@ -231,22 +236,41 @@ object LightClassLazinessChecker {
             }
 
             assertEquals(classInfo(lightClass.clsDelegate), classInfo)
+            checkAnnotationConsistency(lightClass)
 
             innerClasses.forEach(LazinessInfo::checkConsistency)
         }
     }
 
     private fun checkAnnotationConsistency(modifierListOwner: KtLightElement<*, PsiModifierListOwner>) {
-        modifierListOwner.clsDelegate.modifierList?.annotations?.forEach { delegateAnnotation ->
-            val qualifiedName = delegateAnnotation.qualifiedName!!
-            val lightAnnotation = (modifierListOwner as? PsiModifierListOwner)!!.modifierList?.findAnnotation(qualifiedName)
-            assertNotNull(lightAnnotation, "$modifierListOwner is missing annotation ${delegateAnnotation.qualifiedName}")
-            assertNotNull(lightAnnotation!!.nameReferenceElement)
-            if (lightAnnotation is KtLightAbstractAnnotation) {
-                assertEquals(delegateAnnotation, lightAnnotation.clsDelegate)
+        if (modifierListOwner is KtLightClassForFacade) return
+
+        modifierListOwner.clsDelegate.modifierList!!.annotations.groupBy { delegateAnnotation ->
+            delegateAnnotation.qualifiedName!!
+        }.map {
+            (fqName, clsAnnotations) ->
+
+            val lightAnnotations = (modifierListOwner as? PsiModifierListOwner)?.modifierList?.annotations?.filter { it.qualifiedName == fqName }.orEmpty()
+            if (fqName != Nullable::class.java.name && fqName != NotNull::class.java.name) {
+                assertEquals(clsAnnotations.size, lightAnnotations.size, "Missing $fqName annotation")
+            }
+            else {
+                // having duplicating nullability annotations is fine
+                // see KtLightNullabilityAnnotation
+                assertTrue(lightAnnotations.isNotEmpty(), "Missing $fqName annotation")
+            }
+            clsAnnotations.zip(lightAnnotations).forEach {
+                (clsAnnotation, lightAnnotation) ->
+                assertNotNull(lightAnnotation!!.nameReferenceElement)
+                if (lightAnnotation is KtLightAbstractAnnotation) {
+                    assertEquals(clsAnnotation.values(), lightAnnotation.values())
+                    assertEquals(clsAnnotation, lightAnnotation.clsDelegate)
+                }
             }
         }
     }
+
+    private fun PsiAnnotation.values() = parameterList.attributes.map { it.value.stringValue() }
 
     private data class ClassInfo(
             val fieldNames: Collection<String>,
