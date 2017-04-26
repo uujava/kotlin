@@ -10338,6 +10338,42 @@ public class JsCodegenBoxTestGenerated extends AbstractJsCodegenBoxTest {
             doTest(fileName);
         }
 
+        @TestMetadata("signatureOfDeepGenericInner.kt")
+        public void testSignatureOfDeepGenericInner() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/innerNested/signatureOfDeepGenericInner.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("signatureOfDeepInner.kt")
+        public void testSignatureOfDeepInner() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/innerNested/signatureOfDeepInner.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("signatureOfDeepInnerLastGeneric.kt")
+        public void testSignatureOfDeepInnerLastGeneric() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/innerNested/signatureOfDeepInnerLastGeneric.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("signatureOfGenericInnerGenericOuter.kt")
+        public void testSignatureOfGenericInnerGenericOuter() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/innerNested/signatureOfGenericInnerGenericOuter.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("signatureOfGenericInnerSimpleOuter.kt")
+        public void testSignatureOfGenericInnerSimpleOuter() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/innerNested/signatureOfGenericInnerSimpleOuter.kt");
+            doTest(fileName);
+        }
+
+        @TestMetadata("signatureOfSimpleInnerSimpleOuter.kt")
+        public void testSignatureOfSimpleInnerSimpleOuter() throws Exception {
+            String fileName = KotlinTestUtils.navigationMetadata("compiler/testData/codegen/box/innerNested/signatureOfSimpleInnerSimpleOuter.kt");
+            doTest(fileName);
+        }
+
         @TestMetadata("compiler/testData/codegen/box/innerNested/superConstructorCall")
         @TestDataPath("$PROJECT_ROOT")
         @RunWith(JUnit3RunnerWithInners.class)
