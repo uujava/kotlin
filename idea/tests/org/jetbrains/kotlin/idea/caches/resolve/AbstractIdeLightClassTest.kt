@@ -241,6 +241,7 @@ object LightClassLazinessChecker {
             val qualifiedName = delegateAnnotation.qualifiedName!!
             val lightAnnotation = (modifierListOwner as? PsiModifierListOwner)!!.modifierList?.findAnnotation(qualifiedName)
             assertNotNull(lightAnnotation, "$modifierListOwner is missing annotation ${delegateAnnotation.qualifiedName}")
+            assertNotNull(lightAnnotation!!.nameReferenceElement)
             if (lightAnnotation is KtLightAbstractAnnotation) {
                 assertEquals(delegateAnnotation, lightAnnotation.clsDelegate)
             }
