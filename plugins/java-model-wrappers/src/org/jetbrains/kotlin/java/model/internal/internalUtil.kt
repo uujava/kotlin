@@ -71,7 +71,7 @@ internal val PsiModifierListOwner.isFinal: Boolean
 fun PsiModifierListOwner.getJavaModifiers() = modifierList?.getJavaModifiers() ?: emptySet()
 
 fun PsiModifierListOwner.getAnnotationsWithInherited(): List<PsiAnnotation> {
-    val annotations = modifierList?.annotations?.toMutableList() ?: mutableListOf()
+    val annotations = modifierList?.annotations?.filter { it.qualifiedName != null }?.toMutableList() ?: mutableListOf()
 
     if (this is PsiClass) {
         var superClass = superClass
