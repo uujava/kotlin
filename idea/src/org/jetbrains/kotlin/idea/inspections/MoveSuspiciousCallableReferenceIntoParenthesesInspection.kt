@@ -21,12 +21,16 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
+import org.jetbrains.kotlin.builtins.getReturnTypeFromFunctionType
+import org.jetbrains.kotlin.builtins.isBuiltinFunctionalType
+import org.jetbrains.kotlin.builtins.isBuiltinFunctionalTypeOrSubtype
 import org.jetbrains.kotlin.idea.caches.resolve.analyze
 import org.jetbrains.kotlin.idea.intentions.ConvertLambdaToReferenceIntention
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtCallableReferenceExpression
 import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtVisitorVoid
+import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.calls.callUtil.getResolvedCall
 
 class MoveSuspiciousCallableReferenceIntoParenthesesInspection : AbstractKotlinInspection() {
@@ -35,13 +39,18 @@ class MoveSuspiciousCallableReferenceIntoParenthesesInspection : AbstractKotlinI
             override fun visitLambdaExpression(lambdaExpression: KtLambdaExpression) {
                 val callableReference = lambdaExpression.bodyExpression?.statements?.singleOrNull() as? KtCallableReferenceExpression
                 if (callableReference != null) {
+                    val context = lambdaExpression.analyze()
+                    val expectedType = context[BindingContext.EXPECTED_EXPRESSION_TYPE, lambdaExpression]
+                    if (expectedType?.isBuiltinFunctionalType == true) {
+                        val returnType = expectedType.getReturnTypeFromFunctionType()
+                        if (returnType.isBuiltinFunctionalTypeOrSubtype) return
+                    }
                     holder.registerProblem(
                             lambdaExpression,
                             "Suspicious callable reference as the only lambda element",
                             ProblemHighlightType.WEAK_WARNING,
                             IntentionWrapper(MoveIntoParenthesesIntention(), lambdaExpression.containingFile)
                     )
-
                 }
             }
         }

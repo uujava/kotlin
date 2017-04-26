@@ -1,3 +1,4 @@
+// PROBLEMS: false
 // WITH_RUNTIME
 
 fun foo() {

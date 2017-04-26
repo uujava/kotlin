@@ -1,4 +1,4 @@
-// FIX: Move suspicious callable reference into parentheses '()'
+// PROBLEMS: false
 // WITH_RUNTIME
 
 fun foo() {
