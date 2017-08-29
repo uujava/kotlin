@@ -351,6 +351,8 @@ public class ImplementationBodyCodegen extends ClassBodyCodegen {
     protected void generateSyntheticParts() {
         generatePropertyMetadataArrayFieldIfNeeded(classAsmType);
 
+        generateStatelessPropertyInitializers();
+
         generateFieldForSingleton();
 
         generateCompanionObjectBackingFieldCopies();

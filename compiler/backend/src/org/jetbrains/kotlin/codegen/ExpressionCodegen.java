@@ -1970,10 +1970,11 @@ public class ExpressionCodegen extends KtVisitor<StackValue, StackValue> impleme
             fieldName = KotlinTypeMapper.mapDefaultFieldName(propertyDescriptor, isDelegatedProperty);
         }
 
+        boolean isStatic = isStaticBackingField || (isDelegatedProperty && KotlinBuiltIns.isStatelessProperty(delegateType));
         return StackValue.property(propertyDescriptor, backingFieldOwner,
                                    typeMapper.mapType(
                                            isDelegatedProperty && forceField ? delegateType : propertyDescriptor.getOriginal().getType()),
-                                   isStaticBackingField, fieldName, callableGetter, callableSetter, receiver, this, resolvedCall);
+                                   isStatic, fieldName, callableGetter, callableSetter, receiver, this, resolvedCall);
     }
 
     @NotNull
