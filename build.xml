@@ -926,13 +926,13 @@
                   dir="${basedir}/libraries"
                   failonerror="true"
                   timeout="4000000"
-                  maxmemory="400m"
+                  maxmemory="600m"
                   taskname="gradle">
                 <classpath>
                     <pathelement location="${basedir}/libraries/gradle/wrapper/gradle-wrapper.jar"/>
                 </classpath>
                 <arg line="@{tasks}" />
-                <arg line="--no-daemon -Dkotlin.daemon.jvm.options=-Xmx700m -Dkotlin.daemon.verbose=true" />
+                <arg line="--no-daemon -Dkotlin.daemon.jvm.options=-Xmx900m -Dkotlin.daemon.verbose=true" />
                 <arg line="${deployVersion}" />
                 <arg line="${gradle.logging.level}" />
             </java>
